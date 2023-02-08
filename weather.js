@@ -41,7 +41,8 @@ if (weather[city] !== undefined) {
 */
 
 //Feature 1
-let days = ["Sunday", "Monday", "Tuesdays", "Friday", "Saturday"];
+let days = ["Sunday", "Monday", "Tuesday", "Thursday", "Friday", "Saturday"];
+console.log(days[0]);
 
 let todaysDate = new Date();
 
@@ -63,13 +64,50 @@ todaysDate2.innerHTML = `${showTodayDate} ${todayHour}: ${todayMins}`;
 
 //Feature 2
 
-function searchYoCity(event) {
-  event.preventDefault();
-
-  let inputCity = document.querySelector(".enterCity");
-  let cityChanger = document.querySelector(".pearLand");
-  cityChanger.innerHTML = `${inputCity.value}`;
+function displayWeatherCondition(response) {
+  document.querySelector(".pearLand").innerHTML = response.data.name;
+  document.querySelector("#currentWeatherTemp").innerHTML = Math.round(
+    response.data.main.temp
+  );
+  document.querySelector("#weatherFeels").innerHTML =
+    response.data.weather[0].description;
 }
 
+function searchCity(city) {
+  let apiKey = "5f472b7acba333cd8a035ea85a0d4d4c";
+  let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+  axios.get(apiUrl).then(displayWeatherCondition);
+}
+
+function handleSubmit(event) {
+  event.preventDefault();
+  //Place API Call in search function
+
+  let city = document.querySelector(".enterCity").value;
+  searchCity(city);
+}
+
+function searchLocation(position) {
+  let apiKey = "5f472b7acba333cd8a035ea85a0d4d4c";
+  //position.coords.latitude;
+  //position.coords.longitude;
+  let apiUrlLoc = `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=${apiKey}&units=metric`;
+  axios.get(apiUrlLoc).then(displayWeatherCondition);
+}
+
+function getCurrentLocation(event) {
+  event.preventDefault;
+  navigator.geolocation.getCurrentPosition(searchLocation);
+}
+
+// let inputCity = document.querySelector(".enterCity");
+//let cityChanger = document.querySelector(".pearLand");
+//cityChanger.innerHTML = `${inputCity.value}`;
+
 let searchCityForm = document.querySelector("#search-city");
-searchCityForm.addEventListener("submit", searchYoCity);
+searchCityForm.addEventListener("submit", handleSubmit);
+
+let currentLocationButton = document.querySelector("#currentLocBtn");
+currentLocationButton.addEventListener("click", getCurrentLocation);
+
+searchCity("New York");
